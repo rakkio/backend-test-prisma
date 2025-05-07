@@ -1,17 +1,12 @@
-import prisma from '../db/db'
+import prisma from '../db/db.js'
 import jwt from 'jsonwebtoken'
-import { sendError, validateFields } from '../helpers/HelperError'
+import { sendError, validateFields } from '../helpers/HelperError.js'
 
-
-
-
-const generateToken = (userId) => {
-    return jwt.sign({ userId }, Bun.env.JWT_SECRET, { expiresIn: '1h' })
+const generateToken = (user) => {
+    return jwt.sign({ userId: user.id, role: user.role }, Bun.env.JWT_SECRET, { expiresIn: '1h' })
 }
 
-
-
-const createUser = async (req, res) => {
+export const createUser = async (req, res) => {
     try {
         if (!validateFields(['name', 'email', 'password'], req.body)) {
             return sendError(res, 400, "All fields are required")
@@ -29,7 +24,7 @@ const createUser = async (req, res) => {
     }
 }
 
-const loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
     try {
         if (!validateFields(['email', 'password'], req.body)) {
             return sendError(res, 400, "All fields are required")
@@ -39,11 +34,22 @@ const loginUser = async (req, res) => {
         if (!user) return sendError(res, 400, "User not found")
         const isPasswordValid = await Bun.password.verify(password, user.password)
         if (!isPasswordValid) return sendError(res, 400, "Invalid password")
-        const token = generateToken(user.id)
+        const token = generateToken(user)
         res.status(200).json({ message: "Login successful", token })
     } catch (error) {
         sendError(res, 500, "Login failed", error)
     }
 }
 
-export { createUser, loginUser };
+
+
+export const getUserById = async (req, res) => {
+    try {
+        const { userId } = req.user
+        const user = await prisma.user.findUnique({ where: { id: userId } })
+        if (!user) return sendError(res, 404, "User not found")
+        res.status(200).json({ user })
+    } catch (error) {
+        sendError(res, 500, "User retrieval failed", error)
+    }
+}
