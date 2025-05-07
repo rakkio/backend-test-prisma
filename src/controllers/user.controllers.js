@@ -41,8 +41,6 @@ export const loginUser = async (req, res) => {
     }
 }
 
-
-
 export const getUserById = async (req, res) => {
     try {
         const { userId } = req.user
@@ -53,3 +51,5 @@ export const getUserById = async (req, res) => {
         sendError(res, 500, "User retrieval failed", error)
     }
 }
+
+
