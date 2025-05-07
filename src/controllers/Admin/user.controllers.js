@@ -3,23 +3,18 @@ import { sendError } from '../../helpers/HelperError.js'
 
 export const getAllUsers = async (req, res) => {
     try {
-        const users = await prisma.user.findMany()
-        res.status(200).json({ users })
+        const { page = 1, limit = 12} = req.query
+        const users = await prisma.user.findMany({
+            skip: (page - 1) * limit,
+            take: limit
+        })
+        const totalUsers = await prisma.user.count()
+        const totalPages = Math.ceil(totalUsers / limit)
+        res.status(200).json({ users, totalPages })
     } catch (error) {
         sendError(res, 500, "User retrieval failed", error)
     }
 }
-
-export const getUserById = async (req, res) => {
-    try {
-        const { userId } = req.params
-        const user = await prisma.user.findUnique({ where: { id: userId } })
-        res.status(200).json({ user })
-    } catch (error) {
-        sendError(res, 500, "User retrieval failed", error)
-    }
-}       
-
 export const updateUser = async (req, res) => {
     try {
         const { userId } = req.params

@@ -1,6 +1,6 @@
 import { Router } from "express"
 import { createUser, loginUser, getUserById } from "../controllers/user.controllers.js"
-import { getAllUsers, getUserById, updateUser, deleteUser} from "../controllers/Admin/user.controllers.js"
+import { getAllUsers, updateUser, deleteUser} from "../controllers/Admin/user.controllers.js"
 import { verifyToken, verifyAdmin } from "../auth/Auth.js"
     
 const router = Router();
