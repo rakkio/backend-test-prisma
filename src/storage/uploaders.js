@@ -47,7 +47,6 @@ export const uploadToCloudinary = async (file, folder = 'products') => {
   const dataURI = `data:${file.mimetype};base64,${b64}`
   
   try {
-    // Carica su Cloudinary
     const result = await cloudinary.v2.uploader.upload(dataURI, {
       folder: `china/${folder}`,
       resource_type: 'auto'
